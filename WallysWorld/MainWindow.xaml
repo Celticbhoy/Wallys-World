@@ -1,0 +1,21 @@
+﻿<Window x:Class="WallysWorld.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WallysWorld"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Button Content="Button" HorizontalAlignment="Left" Margin="707,284,0,0" VerticalAlignment="Top" Width="75"/>
+        <DataGrid HorizontalAlignment="Left" Height="100" Margin="477,309,0,0" VerticalAlignment="Top" Width="305">
+            <DataGrid.Columns>
+                <DataGridTextColumn Binding="{Binding Path=PersonID}" Header="CustomerID" IsReadOnly="True" />
+                <DataGridTextColumn Binding="{Binding Path=FirstName}" Header="FirstName" IsReadOnly="True" />
+                <DataGridTextColumn Binding="{Binding Path=LastName}" Header="LastName" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding Path=Telephone}" Header="Number" IsReadOnly="True" />
+            </DataGrid.Columns>
+        </DataGrid>
+
+    </Grid>
+</Window>
