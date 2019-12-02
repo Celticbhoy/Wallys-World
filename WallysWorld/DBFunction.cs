@@ -10,7 +10,7 @@ namespace WallysWorld
 {
     class DBFunction
     {
-        string connectionStinrg = "server=127.0.0.1; port=3306; username=root;password=Conestoga1;";
+        string connectionStinrg = "server=127.0.0.1; port=3306; us=root; database=dtwallysworld;";
 
         public object SearchCustomer(string cusIn)
         {
@@ -20,7 +20,7 @@ namespace WallysWorld
             MySqlCommand command = cnn.CreateCommand();
             
             
-            command.CommandText = "SELECT * FROM Person Where Telephone like '%@tele' OR LastName = @last;";
+            command.CommandText = "SELECT PersonID AS PersonNum, FirstName, LastName, Telehpone FROM Person Where Telephone like '%@tele' OR LastName = @last;";
             MySqlDataAdapter adp = new MySqlDataAdapter(command);
             DataSet ds = new DataSet();
             command.Parameters.AddWithValue("@tele", cusIn);

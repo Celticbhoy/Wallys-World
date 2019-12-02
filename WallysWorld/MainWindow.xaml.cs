@@ -23,7 +23,7 @@ namespace WallysWorld
     public partial class MainWindow : Window
     {
         DBFunction dbf = new DBFunction();
-        string connectionStinrg = "server=127.0.0.1; port=3306 username=root;password=Conestoga1;";
+        string connectionStinrg = "server=127.0.0.1; port=3306; username=root; database=dtwallysworld;";
         public MainWindow()
         {
             InitializeComponent();
@@ -33,7 +33,24 @@ namespace WallysWorld
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            dataGridCustomer.DataContext = dbf.SearchCustomer(custInfo.Text);
+            MySqlConnection cnn;
+            cnn = new MySqlConnection(connectionStinrg);
+            cnn.Open();
+            MySqlCommand command = cnn.CreateCommand();
+
+
+
+            command.CommandText = "SELECT PersonID as Customer_Number, FirstName, LastName, Telephone FROM person where lastname='" + custInfo.Text + "' OR Telephone like '%" + custInfo.Text + "%' ";
+            //command.Parameters.AddWithValue("@tele", custInfo.Text);
+            //command.Parameters.AddWithValue("@last", custInfo.Text);
+
+            var myCommand = new MySqlCommand(command.CommandText, cnn);
+            var ds = new DataSet();
+            MySqlDataAdapter mya = new MySqlDataAdapter(myCommand);
+            mya.Fill(ds,"cusTable");
+            dataGridCustomer.DataContext = ds;
+
+            cnn.Close();
 
         }
     }

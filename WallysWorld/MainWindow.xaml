@@ -7,16 +7,9 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <Button Content="Button" HorizontalAlignment="Left" Margin="707,284,0,0" VerticalAlignment="Top" Width="75" Click="Button_Click"/>
-        <DataGrid HorizontalAlignment="Left" Height="100" Margin="477,309,0,0" VerticalAlignment="Top" Width="305" ItemsSource="{Binding Path=cusTable}" x:Name="dataGridCustomer" x:FieldModifier="public">
-            <DataGrid.Columns>
-                <DataGridTextColumn Binding="{Binding Path=PersonID}" Header="CustomerID" IsReadOnly="True" />
-                <DataGridTextColumn Binding="{Binding Path=FirstName}" Header="FirstName" IsReadOnly="True" />
-                <DataGridTextColumn Binding="{Binding Path=LastName}" Header="LastName" IsReadOnly="True"/>
-                <DataGridTextColumn Binding="{Binding Path=Telephone}" Header="Number" IsReadOnly="True" />
-            </DataGrid.Columns>
-        </DataGrid>
-        <TextBox x:Name="custInfo" HorizontalAlignment="Left" Height="22" Margin="511,284,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="168"/>
+        <Button Content="Customer Search" HorizontalAlignment="Left" Margin="675,232,0,0" VerticalAlignment="Top" Width="109" Click="Button_Click" Height="22"/>
+        <DataGrid HorizontalAlignment="Stretch" AutoGenerateColumns="True" Height="166" Margin="462,254,-0.4,0" VerticalAlignment="Top" ItemsSource="{Binding Path=cusTable}" Name="dataGridCustomer" x:FieldModifier="public"/>
+        <TextBox x:Name="custInfo" HorizontalAlignment="Left" Height="22" Margin="462,232,0,0" TextWrapping="Wrap" Text="Search for Customer" VerticalAlignment="Top" Width="208"/>
 
     </Grid>
 </Window>
