@@ -77,7 +77,11 @@ namespace WallysWorld
             cnn.Open();
             string sql;
 
-            sql = "SELECT * from Orders WHERE OrderID=@OrderID";
+            sql = "select o.orderid as OrderID, o.customerid as CustomerID, p.FirstName as FirstName, p.lastName as LastName, o.orderDate AS Date, o.orderStatus As Status from orders o" +
+                " inner join customer c on o.customerid = c.customerid" +
+                " inner join person p" +
+                " on c.personid = p.personid " +
+                "where o.orderid = @OrderID; ";
             var command = new MySqlCommand(sql, cnn);
             command.Parameters.AddWithValue("@OrderID", orderIDSearch.Text);
             var ds = new DataSet();

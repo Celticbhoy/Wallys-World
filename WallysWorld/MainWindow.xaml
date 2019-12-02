@@ -26,7 +26,7 @@
         <Canvas HorizontalAlignment="Left" Height="150" Margin="462,35,0,0" VerticalAlignment="Top" Width="320" Background="LightGray" x:Name="SearchOrder">
             <Button Content="Search" Canvas.Left="235" Canvas.Top="10" Width="75" Click="Button_Click_OrderSearch"/>
             <TextBox x:Name="orderIDSearch"  Height="23" Canvas.Left="49" TextWrapping="Wrap" Text="OrderID" Canvas.Top="11" Width="120"/>
-            <DataGrid ItemsSource="{Binding Path=orderTable}" x:Name="dataGridOrder" Height="100" Canvas.Left="37" Canvas.Top="50" Width="257"/>
+            <DataGrid ItemsSource="{Binding Path=orderTable}" x:Name="dataGridOrder" Height="100" Canvas.Left="10" Canvas.Top="50" Width="300"/>
         </Canvas>
 
     </Grid>
