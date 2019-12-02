@@ -10,7 +10,7 @@ namespace WallysWorld
 {
     class DBFunction
     {
-        string connectionStinrg = "server=127.0.0.1; port=3306 username=root;password=Conestoga1;";
+        string connectionStinrg = "server=127.0.0.1; port=3306; username=root;password=Conestoga1;";
 
         public object SearchCustomer(string cusIn)
         {
