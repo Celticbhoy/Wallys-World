@@ -22,10 +22,10 @@ namespace WallysWorld
     /// </summary>
     public partial class MainWindow : Window
     {
-        
-        string connectionStinrg = "server=127.0.0.1; port=3306; username=root; database=dtwallysworld;";
+        int i = 0;   
+        string connectionStinrg = "server=127.0.0.1; port=3306; username=root; password=Conestoga1;database=dtwallysworld;";
         public MainWindow()
-        {
+        { 
             InitializeComponent();
         }
 
@@ -40,7 +40,7 @@ namespace WallysWorld
 
 
 
-            command.CommandText = "SELECT PersonID as Customer_Number, FirstName, LastName, Telephone FROM person where lastname='" + custInfo.Text + "' OR Telephone like '%" + custInfo.Text + "%' ";
+            command.CommandText = "SELECT CustomerID as Customer_Number, FirstName, LastName, Telephone FROM Customer where lastname='" + custInfo.Text + "' OR Telephone like '%" + custInfo.Text + "%' ";
 
 
             var myCommand = new MySqlCommand(command.CommandText, cnn);
@@ -63,8 +63,10 @@ namespace WallysWorld
             }
             else
             {
-                addCus.Visibility = Visibility.Visible;
                 
+                ShowInv.Visibility = Visibility.Collapsed;
+                SearchOrder.Visibility = Visibility.Collapsed;
+                addCus.Visibility = Visibility.Visible;
                 UpdateLayout();
             }
         }
@@ -76,11 +78,9 @@ namespace WallysWorld
             cnn.Open();
             string sql;
 
-            sql = "select o.orderid as OrderID, o.customerid as CustomerID, p.FirstName as FirstName, p.lastName as LastName, o.orderDate AS Date, o.orderStatus As Status from orders o" +
+            sql = "select o.orderid as OrderID, o.customerid as CustomerID, c.FirstName as FirstName, c.lastName as LastName, o.orderDate AS Date, o.orderStatus As Status from orders o" +
                 " inner join customer c on o.customerid = c.customerid" +
-                " inner join person p" +
-                " on c.personid = p.personid " +
-                "where o.orderid = @OrderID; ";
+                " where o.orderid = @OrderID; ";
             var command = new MySqlCommand(sql, cnn);
             command.Parameters.AddWithValue("@OrderID", orderIDSearch.Text);
             var ds = new DataSet();
@@ -103,8 +103,11 @@ namespace WallysWorld
             }
             else
             {
+                
+                addCus.Visibility = Visibility.Collapsed;
+                ShowInv.Visibility = Visibility.Collapsed;
                 SearchOrder.Visibility = Visibility.Visible;
-             
+
                 UpdateLayout();
             }
         }
@@ -116,12 +119,12 @@ namespace WallysWorld
             cnn.Open();
             string sql;
 
-            sql = "SELECT * FROM Item;";
+            sql = "SELECT * FROM item;";
             var command = new MySqlCommand(sql, cnn);
             var ds = new DataSet();
             MySqlDataAdapter mya = new MySqlDataAdapter(command);
-            mya.Fill(ds, "orderTable");
-            dataGridOrder.DataContext = ds;
+            mya.Fill(ds, "invTable");
+            dataGridOrder1.DataContext = ds;
             cnn.Close();
 
         }
@@ -135,8 +138,11 @@ namespace WallysWorld
             }
             else
             {
-                ShowInv.Visibility = Visibility.Visible;
                 
+                newOrder.Visibility = Visibility.Collapsed;
+                addCus.Visibility = Visibility.Collapsed;
+                ShowInv.Visibility = Visibility.Visible;
+
                 UpdateLayout();
             }
         }
@@ -171,6 +177,65 @@ namespace WallysWorld
 
         private void Button_Click_CompleteOrder(object sender, RoutedEventArgs e)
         {
+            int i = 0;
+
+            dataGridCurrentOrder.DataContext = null;
+            MySqlConnection cnn;
+            cnn = new MySqlConnection(connectionStinrg);
+            cnn.Open();
+
+            var currOrder = cnn.CreateCommand();
+            currOrder.CommandText = "SELECT MAX(OrderID) from orders;";
+            var OrderID = Convert.ToInt32(currOrder.ExecuteScalar());
+            currOrder.Dispose();
+
+            cnn = new MySqlConnection(connectionStinrg);
+            cnn.Open();
+            MySqlCommand command = cnn.CreateCommand();
+            command.CommandText = "SELECT sum(sPrice) from OrderLine where orderid = @orderid;";
+            command.Parameters.AddWithValue("@orderid", OrderID);
+            var subtotal = Convert.ToDouble(command.ExecuteScalar());
+            var saletotal = subtotal * 1.13;
+
+            MySqlCommand commandCusName = cnn.CreateCommand();
+            commandCusName.CommandText = "SELECT FirstName, LastName from Customer where CustomerID = @CustomerID;";
+            commandCusName.Parameters.AddWithValue("@CustomerID", orderCusID.Text);
+            MySqlDataReader dr = commandCusName.ExecuteReader();
+            var cusName = "";
+            while (dr.Read())
+            {
+                int j = 0;
+                while (j < dr.FieldCount)
+                {
+                    cusName = cusName + dr.GetValue(j) + " ";
+                    j++;
+
+                }
+
+            }
+            commandCusName.Dispose();
+
+            MySqlCommand orderDetails = cnn.CreateCommand();
+            orderDetails.CommandText = "SELECT  i.name, ol.orderquantity, ol.sprice from orderline ol "+
+                                        "inner join item i on ol.itemid = i.itemid " +
+                                        "where ol.orderid = @OrderID";
+            orderDetails.Parameters.AddWithValue("@OrderID", OrderID);
+            dr = orderDetails.ExecuteReader();
+            string[] orderInfo = "";
+            int k = 0;
+            while (dr.Read())
+            {
+                int j = 0;
+                while(j < dr.FieldCount)
+                {
+                    
+                    orderInfo[k] = dr.GetValue(j).ToString();
+                    j++;
+
+                }
+                k++;
+
+            }
 
         }
 
@@ -186,17 +251,123 @@ namespace WallysWorld
 
             cnn = new MySqlConnection(connectionStinrg);
             cnn.Open();
-            string sql;
-            sql = "INSERT INTO Person (FirstName, LastName, DateofBirth, Telephone) VALUES (@FirstName, @LastName, @DOB, @Telephone);";
+            MySqlCommand command = cnn.CreateCommand();
+            command.CommandText = "INSERT INTO Customer (FirstName, LastName, DateofBirth, Telephone) VALUES (@FirstName, @LastName, @DOB, @Telephone);";
 
-            var command = new MySqlCommand(sql, cnn);
+            
             command.Parameters.AddWithValue("@FirstName", newCusFirst.Text);
             command.Parameters.AddWithValue("@LastName", newCusLast.Text);
             command.Parameters.AddWithValue("@DOB", newCustDOB.Text);
-            command.Parameters.AddWithValue("@Telephone", newCusTele);
+            command.Parameters.AddWithValue("@Telephone", newCusTele.Text);
+                command.ExecuteNonQuery();
   
             cnn.Close();
         }
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            
+            MySqlConnection cnn;
+            cnn = new MySqlConnection(connectionStinrg);
+            cnn.Open();
+            MySqlCommand command = cnn.CreateCommand();
+            command.CommandText = "SELECT stock from item where itemid = @ItemID;";
+            command.Parameters.AddWithValue("@ItemID",itemid.Text);
+            var val =  Convert.ToDouble(command.ExecuteScalar());
+
+            command.CommandText = "Select wprice from item where itemid = @itemID";
+            var price = Convert.ToDouble(command.ExecuteScalar());
+
+            var conval = Convert.ToDouble(val);
+            var oq = Convert.ToDouble(orderQuantity.Text);
+            
+            if (val - oq < 0)
+            {
+                MessageBox.Show("Invalid Quantity - Check Inventory", "Order Error");
+                return;
+            }
+            else
+            {
+                var stockcmd = cnn.CreateCommand();
+                var stock = val - oq;
+                stockcmd.CommandText = "Update Item SET stock = @stock WHERE ItemID = @ItemID";
+                stockcmd.Parameters.AddWithValue("@ItemID", itemid.Text);
+                stockcmd.Parameters.AddWithValue("@stock", stock);
+                stockcmd.ExecuteNonQuery();
+
+                stockcmd.Dispose();
+                
+            }
+
+            if(i == 0)
+            {
+                var createOrderCmd = cnn.CreateCommand();
+                createOrderCmd.CommandText = "INSERT INTO Orders (CustomerID, BranchID, OrderDate, OrderStatus) VALUES (@CustomerID, @BranchID, @OrderDate, @OrderStatus);";
+                createOrderCmd.Parameters.AddWithValue("@CustomerID",orderCusID.Text);
+                createOrderCmd.Parameters.AddWithValue("@BranchID", orderCusID.Text);
+                createOrderCmd.Parameters.AddWithValue("@OrderDate", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+                createOrderCmd.Parameters.AddWithValue("@OrderStatus", "PAID");
+                createOrderCmd.ExecuteNonQuery();
+                createOrderCmd.Dispose();
+
+                var currOrder = cnn.CreateCommand();
+                currOrder.CommandText = "SELECT MAX(OrderID) from orders;";
+                var OrderID = Convert.ToInt32(currOrder.ExecuteScalar());
+                currOrder.Dispose();
+
+                var updateOrder = cnn.CreateCommand();
+                updateOrder.CommandText ="INSERT INTO Orderline(OrderID, ItemID, OrderQuantity, sPrice) VALUES (@OrderID, @ItemID, @OrderQuantity, @sPrice);";
+                updateOrder.Parameters.AddWithValue("@OrderID", OrderID);
+                updateOrder.Parameters.AddWithValue("@ItemID", itemid.Text);
+                updateOrder.Parameters.AddWithValue("@OrderQuantity", orderQuantity.Text);
+                updateOrder.Parameters.AddWithValue("@sPrice", (price * 1.4));
+                updateOrder.ExecuteNonQuery();
+                updateOrder.Dispose();
+
+                var orderState = cnn.CreateCommand();
+                orderState.CommandText = "Select * from orderline where orderid = @orderid";
+                orderState.Parameters.AddWithValue("@orderid", OrderID);
+                var ds = new DataSet();
+                MySqlDataAdapter mya = new MySqlDataAdapter(orderState);
+                mya.Fill(ds, "currentOrder");
+                dataGridCurrentOrder.DataContext = ds;
+
+                command.Dispose();
+                cnn.Close();
+                i++;
+            }
+            else
+            {
+                var currOrder = cnn.CreateCommand();
+                currOrder.CommandText = "SELECT MAX(OrderID) from Orders;";
+                var OrderID = Convert.ToInt32(currOrder.ExecuteScalar());
+                currOrder.Dispose();
+
+
+                var updateOrder = cnn.CreateCommand();
+                updateOrder.CommandText = "INSERT INTO Orderline(OrderID, ItemID, OrderQuantity, sPrice) VALUES (@OrderID, @ItemID, @OrderQuantity, @sPrice);";
+                updateOrder.Parameters.AddWithValue(@"OrderID", OrderID);
+                updateOrder.Parameters.AddWithValue("@ItemID", itemid.Text);
+                updateOrder.Parameters.AddWithValue("@OrderQuantity", orderQuantity.Text);
+                updateOrder.Parameters.AddWithValue("@sPrice", price * 1.4);
+                updateOrder.ExecuteNonQuery();
+
+                var orderState = cnn.CreateCommand();
+                orderState.CommandText = "Select * from orderline where orderid = @orderid";
+                orderState.Parameters.AddWithValue("@orderid", OrderID);
+                var ds = new DataSet();
+                MySqlDataAdapter mya = new MySqlDataAdapter(orderState);
+                mya.Fill(ds, "currentOrder");
+                dataGridCurrentOrder.DataContext = ds;
+
+                orderState.Dispose();
+                updateOrder.Dispose();
+                command.Dispose();
+                cnn.Close();
+
+            }
+
         }
     }
 }
