@@ -187,17 +187,14 @@ namespace WallysWorld
             cnn = new MySqlConnection(connectionStinrg);
             cnn.Open();
             string sql;
-            sql = "INSERT INTO PersonFirstName, LastName, DateofBirth, Telephone) VALUES (@FirstName, @LastName, @DOB, @Telephone);";
+            sql = "INSERT INTO Person (FirstName, LastName, DateofBirth, Telephone) VALUES (@FirstName, @LastName, @DOB, @Telephone);";
 
             var command = new MySqlCommand(sql, cnn);
             command.Parameters.AddWithValue("@FirstName", newCusFirst.Text);
             command.Parameters.AddWithValue("@LastName", newCusLast.Text);
             command.Parameters.AddWithValue("@DOB", newCustDOB.Text);
             command.Parameters.AddWithValue("@Telephone", newCusTele);
-            var ds = new DataSet();
-            MySqlDataAdapter mya = new MySqlDataAdapter(command);
-            mya.Fill(ds, "orderTable");
-            dataGridOrder.DataContext = ds;
+  
             cnn.Close();
         }
         }
