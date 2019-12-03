@@ -41,8 +41,7 @@ namespace WallysWorld
 
 
             command.CommandText = "SELECT PersonID as Customer_Number, FirstName, LastName, Telephone FROM person where lastname='" + custInfo.Text + "' OR Telephone like '%" + custInfo.Text + "%' ";
-            //command.Parameters.AddWithValue("@tele", custInfo.Text);
-            //command.Parameters.AddWithValue("@last", custInfo.Text);
+
 
             var myCommand = new MySqlCommand(command.CommandText, cnn);
             var ds = new DataSet();
@@ -59,13 +58,13 @@ namespace WallysWorld
             if (addCus.Visibility == Visibility.Visible)
             {
                 addCus.Visibility = Visibility.Collapsed;
-                SearchOrder.Visibility = Visibility.Visible;
+                
                 UpdateLayout();
             }
             else
             {
                 addCus.Visibility = Visibility.Visible;
-                SearchOrder.Visibility = Visibility.Collapsed;
+                
                 UpdateLayout();
             }
         }
@@ -98,16 +97,109 @@ namespace WallysWorld
             if(SearchOrder.Visibility == Visibility.Visible)
             {
                 SearchOrder.Visibility = Visibility.Collapsed;
-                addCus.Visibility = Visibility.Visible;
+                
                 UpdateLayout();
 
             }
             else
             {
                 SearchOrder.Visibility = Visibility.Visible;
-                addCus.Visibility = Visibility.Collapsed;
+             
                 UpdateLayout();
             }
+        }
+
+        private void Button_Click_ShowInv(object sender, RoutedEventArgs e)
+        {
+            MySqlConnection cnn;
+            cnn = new MySqlConnection(connectionStinrg);
+            cnn.Open();
+            string sql;
+
+            sql = "SELECT * FROM Item;";
+            var command = new MySqlCommand(sql, cnn);
+            var ds = new DataSet();
+            MySqlDataAdapter mya = new MySqlDataAdapter(command);
+            mya.Fill(ds, "orderTable");
+            dataGridOrder.DataContext = ds;
+            cnn.Close();
+
+        }
+
+        private void Button_Click_OpenInv(object sender, RoutedEventArgs e)
+        {
+            if(ShowInv.Visibility == Visibility.Visible)
+            {
+                ShowInv.Visibility = Visibility.Collapsed;
+                UpdateLayout();
+            }
+            else
+            {
+                ShowInv.Visibility = Visibility.Visible;
+                
+                UpdateLayout();
+            }
+        }
+
+        private void Button_Click_CreateOrder(object sender, RoutedEventArgs e)
+        {
+            if(newOrder.Visibility== Visibility.Visible)
+            {
+                newOrder.Visibility = Visibility.Collapsed;
+                UpdateLayout();
+            }
+            else
+            {
+                newOrder.Visibility = Visibility.Visible;
+                UpdateLayout();
+            }
+        }
+
+        private void Button_Click_OpenRefund(object sender, RoutedEventArgs e)
+        {
+            if(refundOrder.Visibility == Visibility.Visible)
+            {
+                refundOrder.Visibility = Visibility.Collapsed;
+                UpdateLayout();
+            }
+            else
+            {
+                refundOrder.Visibility = Visibility.Visible;
+                UpdateLayout();
+            }
+        }
+
+        private void Button_Click_CompleteOrder(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Button_Click_AddCus(object sender, RoutedEventArgs e)
+        {
+            if (newCusFirst.Text == "" || newCusLast.Text == "" || newCustDOB.Text == "" || newCusTele.Text == "")
+            {
+                MessageBox.Show("Ensure all entries are filled", "Adding New Customer");
+            }
+            else
+            { 
+             MySqlConnection cnn;
+
+            cnn = new MySqlConnection(connectionStinrg);
+            cnn.Open();
+            string sql;
+            sql = "INSERT INTO PersonFirstName, LastName, DateofBirth, Telephone) VALUES (@FirstName, @LastName, @DOB, @Telephone);";
+
+            var command = new MySqlCommand(sql, cnn);
+            command.Parameters.AddWithValue("@FirstName", newCusFirst.Text);
+            command.Parameters.AddWithValue("@LastName", newCusLast.Text);
+            command.Parameters.AddWithValue("@DOB", newCustDOB.Text);
+            command.Parameters.AddWithValue("@Telephone", newCusTele);
+            var ds = new DataSet();
+            MySqlDataAdapter mya = new MySqlDataAdapter(command);
+            mya.Fill(ds, "orderTable");
+            dataGridOrder.DataContext = ds;
+            cnn.Close();
+        }
         }
     }
 }
