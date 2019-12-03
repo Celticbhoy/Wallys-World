@@ -1,3 +1,4 @@
 All refunds require the customer to know their OrderID number [from the sales record]
 All refunds require the whole order to be refunded, can't accept single item refunds on multi refund order.
 The price of the sample data products were wholesale price, not sale price that had to be calculated
+The Waterloo location is St Jacobs 
