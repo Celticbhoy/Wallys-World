@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -139,8 +140,6 @@ namespace WallysWorld
             else
             {
                 
-                newOrder.Visibility = Visibility.Collapsed;
-                addCus.Visibility = Visibility.Collapsed;
                 ShowInv.Visibility = Visibility.Visible;
 
                 UpdateLayout();
@@ -221,7 +220,7 @@ namespace WallysWorld
                                         "where ol.orderid = @OrderID";
             orderDetails.Parameters.AddWithValue("@OrderID", OrderID);
             dr = orderDetails.ExecuteReader();
-            string[] orderInfo = "";
+            List<string> orderInfo = new List<string>();
             int k = 0;
             while (dr.Read())
             {
@@ -229,11 +228,31 @@ namespace WallysWorld
                 while(j < dr.FieldCount)
                 {
                     
-                    orderInfo[k] = dr.GetValue(j).ToString();
+                    orderInfo.Add(Convert.ToString(dr.GetValue(j)));
                     j++;
 
                 }
                 k++;
+
+            }
+
+            string path = "Wally'sWorldSalesRecord" + OrderID + ".txt";
+            if (!File.Exists(path))
+            {
+                using (StreamWriter sw = File.CreateText(path))
+                {
+                    sw.WriteLine("Thank you for shopping at Wally's World \nOn " + DateTime.Now.ToString("yyyy-MM-dd") +" , "+ cusName + "\n" +
+                        "Order ID: " + OrderID + " \n");
+                    for(int j = 0; j < orderInfo.Count;  j = j+3){
+                        sw.WriteLine("" + orderInfo[j] + " " + orderInfo[j + 1] + " x " + orderInfo[j + 2] + " = " + Convert.ToDouble(orderInfo[j + 1]) * Convert.ToDouble(orderInfo[j + 2]) + " \n");
+                    }
+                    sw.WriteLine("Subtotal = $" + subtotal + "\n");
+                    sw.WriteLine("HST(13%) = $" + subtotal * .13 + "\n");
+                    sw.WriteLine("SaleTotal = $" + saletotal + "\n");
+                    sw.WriteLine("Paid -- Thank You");
+
+
+                }
 
             }
 
@@ -367,6 +386,22 @@ namespace WallysWorld
                 cnn.Close();
 
             }
+
+        }
+
+        private void Button_Click_2(object sender, RoutedEventArgs e)
+        {
+
+            MySqlConnection cnn;
+            cnn = new MySqlConnection(connectionStinrg);
+            cnn.Open();
+            MySqlCommand command = cnn.CreateCommand();
+
+            command.CommandText = "UPDATE Orders SET OrderStatus = @OrderStatus where OrderID = @OrderID";
+            command.Parameters.AddWithValue("@OrderStatus", "RFND");
+            command.Parameters.AddWithValue("@OrderID", refundOrderID.Text);
+            command.ExecuteNonQuery();
+            
 
         }
     }
